@@ -898,8 +898,8 @@ In the decodeMBPEntry() and decodeMBOEntry() methods:
 One thing to bear in mind with the example code is that it is purely for
 illustration purposes and should not be used for production purposes.
 
->   [Source
->   Code](https://github.com/umernalla/L2-Test/blob/master/OrderBookSort%20Source%20Code.zip)
+**>   [Sample EMA C++ Source
+>   Code](https://github.com/umernalla/L2-Test/blob/master/OrderBookSort%20Source%20Code.zip)**
 
 
 **Additional Resources**
