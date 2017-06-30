@@ -117,15 +117,15 @@ So, the applications registers a client to for the MMT_LOGIN domain.
 
 ```java
 
-	{
-		AppClient appClient = new AppClient();
-		consumer = EmaFactory.createOmmConsumer(EmaFactory.createOmmConsumerConfig().host("10.11.234.56:14002").username("umer.nalla"));
-			
-		ReqMsg reqMsg = EmaFactory.createReqMsg();
-		consumer.registerClient(reqMsg.domainType( EmaRdm.MMT_LOGIN ), appClient, consumer);
-	
-		Thread.sleep(60000);			// API calls onRefreshMsg(), onUpdateMsg() and onStatusMsg()
-	} 
+{
+	AppClient appClient = new AppClient();
+	consumer = EmaFactory.createOmmConsumer(EmaFactory.createOmmConsumerConfig().host("10.11.234.56:14002").username("umer.nalla"));
+		
+	ReqMsg reqMsg = EmaFactory.createReqMsg();
+	consumer.registerClient(reqMsg.domainType( EmaRdm.MMT_LOGIN ), appClient, consumer);
+
+	Thread.sleep(60000);			// API calls onRefreshMsg(), onUpdateMsg() and onStatusMsg()
+} 
 ```
 
 Here, the code declares the callback client, creates the OmmConsumer instance and provides the connectivity parameters + username. It then creates the ReqMsg and registers the callback client to receive the Login related events and messages. It also passes in the reference to the OmmConsumer instance using the Closure parameter.   
@@ -135,38 +135,33 @@ So, let's go ahead and examine the onRefreshMsg callback method.
    
 ```java
    
-	public void onRefreshMsg(RefreshMsg refreshMsg, OmmConsumerEvent event)   
+public void onRefreshMsg(RefreshMsg refreshMsg, OmmConsumerEvent event)   
+{
+...
+	if ( refreshMsg.domainType() == EmaRdm.MMT_LOGIN && 
+		refreshMsg.state().streamState() == OmmState.StreamState.OPEN &&
+		refreshMsg.state().dataState() == OmmState.DataState.OK )
 	{
-		System.out.println("Received Refresh. Item Handle: " + event.handle() + " Closure: " + event.closure());
-		System.out.println("Item Name: " + (refreshMsg.hasName() ? refreshMsg.name() : "<not set>"));
-		System.out.println("Service Name: " + (refreshMsg.hasServiceName() ? refreshMsg.serviceName() : "<not set>"));
-
-		System.out.println("Item State: " + refreshMsg.state());
-
-		if ( refreshMsg.domainType() == EmaRdm.MMT_LOGIN && 
-				refreshMsg.state().streamState() == OmmState.StreamState.OPEN &&
-				refreshMsg.state().dataState() == OmmState.DataState.OK )
-			{
-				PostMsg postMsg = EmaFactory.createPostMsg();
-				RefreshMsg nestedRefreshMsg = EmaFactory.createRefreshMsg();
-				FieldList nestedFieldList = EmaFactory.createFieldList();
+		PostMsg postMsg = EmaFactory.createPostMsg();
+		RefreshMsg nestedRefreshMsg = EmaFactory.createRefreshMsg();
+		FieldList nestedFieldList = EmaFactory.createFieldList();
 				
-				//FieldList is a collection in java
-				nestedFieldList.add(EmaFactory.createFieldEntry().real(22, 34, OmmReal.MagnitudeType.EXPONENT_POS_1));
-				nestedFieldList.add(EmaFactory.createFieldEntry().real(25, 35, OmmReal.MagnitudeType.EXPONENT_POS_1));
-				nestedFieldList.add(EmaFactory.createFieldEntry().time(18, 11, 29, 30));
-				nestedFieldList.add(EmaFactory.createFieldEntry().enumValue(37, 3));
-				
-				nestedRefreshMsg.payload(nestedFieldList ).complete(true);
-				
-				((OmmConsumer)event.closure()).submit( postMsg.postId( 1 ).serviceId( 260 )
-				  .name( "TEST.TST" ).solicitAck( true ).complete(true)    
-				  .payload(nestedRefreshMsg), event.handle() );   
-			}
-	
-		decode( refreshMsg );
-		System.out.println();
+		//FieldList is a collection in java
+		nestedFieldList.add(EmaFactory.createFieldEntry().real(22, 34, OmmReal.MagnitudeType.EXPONENT_POS_1));
+		nestedFieldList.add(EmaFactory.createFieldEntry().real(25, 35, OmmReal.MagnitudeType.EXPONENT_POS_1));
+		nestedFieldList.add(EmaFactory.createFieldEntry().time(18, 11, 29, 30));
+		nestedFieldList.add(EmaFactory.createFieldEntry().enumValue(37, 3));
+			
+		nestedRefreshMsg.payload(nestedFieldList ).complete(true);
+			
+		((OmmConsumer)event.closure()).submit( postMsg.postId( 1 ).serviceId( 260 )
+		  .name( "TEST.TST" ).solicitAck( true ).complete(true)    
+		  .payload(nestedRefreshMsg), event.handle() );   
 	}
+	
+	decode( refreshMsg );
+	System.out.println();
+}
 
 ```
 
@@ -216,21 +211,17 @@ It is possible to send a RefreshMsg even if the item already exists, however, to
 Since the application set the solicitAck attribute to true, an onAckMsg() callback handler method has been implemented:
 
 ```java
-
-	public void onAckMsg(AckMsg ackMsg, OmmConsumerEvent event)
-	{
-		System.out.println("Received AckMsg. Item Handle: " + event.handle() + " Closure: " + event.closure());
-		
-		decode( ackMsg );
-		
-		System.out.println();
-	}
+public void onAckMsg(AckMsg ackMsg, OmmConsumerEvent event)
+{
+	System.out.println("Received AckMsg. Item Handle: " + event.handle() + " Closure: " + event.closure());
+	decode( ackMsg );
+	System.out.println();
+}
 ```  
 
 Example output from onAckMsg() method:
 
 ```
-
 Received AckMsg. Item Handle: 1 Closure: com.thomsonreuters.ema.access.OmmConsumerImpl@668dc22c  
 Item Name: TEST.TST  
 Service Name: not set  
