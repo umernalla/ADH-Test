@@ -189,6 +189,7 @@ As this is just an example application, there are a few things to be aware of:
 * In this example the PostMsg is sent from the onRefreshMsg handler. In fact you can send a PostMsg at any point after you have connected to the server and performed a sucessful Login.
 * As mentioned previously, you do need a handle to submit the PostMsg - so you either use the Loging handle for off-stream Posting or the item handle for On-Stream Posting
 * To explore On-Stream Posting please take a look at ***example340\__MarketPrice\__OnStreamPost*** from the EMA devkit
+* The example uses a simple MarketPrice domain, however the ADH Cache can support all data Domains
   
 
 Since the example sets the ```solicitAck(true)```, an ```onAckMsg()``` callback handler method has been implemented to handle the acknowledgement message:
