@@ -27,7 +27,7 @@ In order to use the above feature, you will of course need a TREP installation a
  
 Assuming you are in a position to amend the TREP configuration, the first step will be to define the cache as a Non Interactive Provider (NIP) service/source on the TREP system. Your Market Data team may well be familiar with the steps required - otherwise you can refer to the guide we have published on our Developer Portal:
 
-[TREP Configuration for NI Providers](https://developers.thomsonreuters.com/elektron/elektron-sdk-java/learning?content=11680&type=learning_material_item)
+[RTDS Configuration for NI Providers](https://developers.refinitiv.com/en/api-catalog/refinitiv-real-time-opnsrc/rt-sdk-java/tutorials/ema-ni-provider/trep-configuration-for-ni-providers)
 
 You will need to decide on a name for this new service e.g. I am going to use **_NIPROV_** for the purpose of this article. Your Market Data team may be able to advise on a suitable name - based on any internal policy. 
 
